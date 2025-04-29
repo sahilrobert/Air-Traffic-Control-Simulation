@@ -1,0 +1,98 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Constants for array sizes
+#define MAX_FLIGHTS 10           // Maximum number of flights that can be handled
+#define MAX_NAME_LENGTH 10       // Maximum length of flight name
+
+// Structure to represent a flight
+struct Flight {
+    char name[MAX_NAME_LENGTH];  // Name/ID of the flight
+};
+
+// Structure to represent the Air Traffic Control system
+struct AirTrafficControl {
+    struct Flight departureQueue[MAX_FLIGHTS];  // Queue for departing flights
+    struct Flight arrivalQueue[MAX_FLIGHTS];    // Queue for arriving flights
+    int departureFront, departureRear;          // Front and rear pointers for departure queue
+    int arrivalFront, arrivalRear;              // Front and rear pointers for arrival queue
+};
+
+// Function to add a flight to the departure queue
+void addDeparture(struct AirTrafficControl *atc, const char *flightName) {
+    // Check if the departure queue is full
+    if (atc->departureRear == MAX_FLIGHTS - 1) {
+        printf("Departure queue is full.\n");
+        return;
+    }
+
+    // Create a new flight and copy the name safely
+    struct Flight newFlight;
+    strncpy(newFlight.name, flightName, MAX_NAME_LENGTH - 1);
+    newFlight.name[MAX_NAME_LENGTH - 1] = '\0';
+
+    // Add flight to the next available spot in the queue
+    atc->departureQueue[++atc->departureRear] = newFlight;
+
+    printf("Flight %s added to departure queue.\n", flightName);
+}
+
+// Function to add a flight to the arrival queue
+void addArrival(struct AirTrafficControl *atc, const char *flightName) {
+    // Check if the arrival queue is full
+    if (atc->arrivalRear == MAX_FLIGHTS - 1) {
+        printf("Arrival queue is full.\n");
+        return;
+    }
+
+    // Create a new flight and copy the name safely
+    struct Flight newFlight;
+    strncpy(newFlight.name, flightName, MAX_NAME_LENGTH - 1);
+    newFlight.name[MAX_NAME_LENGTH - 1] = '\0';
+
+    // Add flight to the next available spot in the queue
+    atc->arrivalQueue[++atc->arrivalRear] = newFlight;
+
+    printf("Flight %s added to arrival queue.\n", flightName);
+}
+
+// Function to process the next flight in the departure queue
+void processDepartures(struct AirTrafficControl *atc) {
+    // Check if there are any flights to depart
+    if (atc->departureFront > atc->departureRear) {
+        printf("No flights in the departure queue.\n");
+        return;
+    }
+
+    // Process the flight at the front of the departure queue
+    printf("Flight %s cleared for departure.\n", atc->departureQueue[atc->departureFront++].name);
+}
+
+// Function to process the next flight in the arrival queue
+void processArrivals(struct AirTrafficControl *atc) {
+    // Check if there are any flights to land
+    if (atc->arrivalFront > atc->arrivalRear) {
+        printf("No flights in the arrival queue.\n");
+        return;
+    }
+
+    // Process the flight at the front of the arrival queue
+    printf("Flight %s cleared to land.\n", atc->arrivalQueue[atc->arrivalFront++].name);
+}
+
+// Main function to demonstrate the simulation
+int main() {
+    // Initialize the Air Traffic Control system with empty queues
+    struct AirTrafficControl atc = {{}, {}, 0, -1, 0, -1};
+
+    // Add flights to the queues
+    addDeparture(&atc, "DL123");  // Add a flight to the departure queue
+    addArrival(&atc, "UA456");    // Add a flight to the arrival queue
+
+    // Process the flights
+    processDepartures(&atc);      // Simulate departure
+    processArrivals(&atc);        // Simulate arrival
+
+    return 0;
+}
